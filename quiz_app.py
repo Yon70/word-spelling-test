@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -16,42 +16,49 @@ words = [
     {"word": "white", "meaning": "흰색"}
 ]
 
-# 빈칸 포함된 단어 생성 함수
+# Function to create a blanked-out word for the question
 def create_blank(word):
     if len(word) <= 3:
         return word[0] + "_" + word[2:]
     else:
         return word[0] + "_" * (len(word) - 2) + word[-1]
 
-# 현재 진행 중인 시험 문제
+# Current question index and test completion status
 current_question_index = 0
+test_complete = False
 
 @app.route('/')
 def index():
-    global current_question_index
+    global test_complete
+    if test_complete:
+        return "The test is complete. Thank you for participating!"
+
     question = words[current_question_index]
     question_text = f"{create_blank(question['word'])}: {question['meaning']}"
     return render_template("index.html", question_text=question_text, correct_word=question["word"], attempt=1, message="")
 
 @app.route('/check_answer', methods=['POST'])
 def check_answer():
-    global current_question_index
+    global current_question_index, test_complete
     user_answer = request.form['answer'].lower()
     correct_word = request.form['word']
     attempt = int(request.form['attempt'])
 
     if user_answer == correct_word:
         message = "Correct!"
-        current_question_index = (current_question_index + 1) % len(words)
     else:
         if attempt < 2:
             message = "Incorrect. Try again!"
             return render_template("index.html", question_text=f"{create_blank(correct_word)}: {words[current_question_index]['meaning']}", correct_word=correct_word, attempt=attempt + 1, message=message)
         else:
-            message = f"Incorrect. The correct answer was '{correct_word}'. Moving to the next word."
-            current_question_index = (current_question_index + 1) % len(words)
+            message = f"Incorrect. The correct answer was '{correct_word}'."
 
-    # 다음 문제로 이동
+    # Move to the next question
+    current_question_index += 1
+    if current_question_index >= len(words):
+        test_complete = True
+        return "The test is now complete. Thank you for participating!"
+
     next_question = words[current_question_index]
     question_text = f"{create_blank(next_question['word'])}: {next_question['meaning']}"
     return render_template("index.html", question_text=question_text, correct_word=next_question["word"], attempt=1, message=message)
