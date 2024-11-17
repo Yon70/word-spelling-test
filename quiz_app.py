@@ -1,47 +1,38 @@
-import csv
+from flask import Flask, render_template, request
 
-# Function to load words from a CSV file
-def load_words_from_csv(file_name):
-    words = []
-    with open(file_name, newline='', encoding='utf-8') as csvfile:
-        reader = csv.reader(csvfile)
-        for row in reader:
-            words.append((row[0], row[1]))  # (Korean word, English word)
-    return words
+app = Flask(__name__)
 
-# Function to format the blanks based on the word length
-def format_blanks(word):
-    if len(word) <= 4:
-        return "_" * len(word)
-    else:
-        return "_" * len(word) + " " + "_" * (len(word) - len(word)//2)
+words = [("노랑", "yellow"), ("파랑색", "blue"), ("빨강색", "red"), ("녹색", "green"),
+         ("보라색", "purple"), ("주황색", "orange"), ("갈색", "brown"), ("분홍색", "pink"),
+         ("검은색", "black"), ("흰색", "white")]
 
-# Main function for the test
-def phonics_test():
-    words = load_words_from_csv('phonics_words.csv')  # Load from your CSV file
-    score = 0
-    total_questions = len(words)
+@app.route('/')
+def index():
+    question = words[0]  # Pick the first word for simplicity
+    question_text = f"What is the English word for {question[0]}?"
+    return render_template('test.html', question_text=question_text, correct_word=question[1], attempt=1, message="")
+
+@app.route('/check_answer', methods=['POST'])
+def check_answer():
+    answer = request.form['answer']
+    correct_word = request.form['word']
+    attempt = int(request.form['attempt']) + 1  # Increment the attempt number
     
-    print("Phonics Test! Fill in the English word for the Korean color:")
-    
-    for i, (korean, english) in enumerate(words, 1):
-        blank = format_blanks(english)  # Format the blanks based on word length
-        answer = input(f"{i}. {korean} ({blank}) = ").strip().lower()
-        
-        if answer == english.lower():
-            score += 1
-            print("Correct!")
-        else:
-            print(f"Wrong! The correct answer is '{english}'.")
-
-    # Calculate the score percentage
-    score_percentage = (score / total_questions) * 100
-    print(f"\nYour final score is: {score}/{total_questions} ({score_percentage:.2f}%)")
-
-    if score_percentage >= 60:
-        print("Great job!")
+    if answer.lower() == correct_word.lower():
+        message = "Correct!"
     else:
-        print("숙제")
+        message = f"Wrong! The correct answer is {correct_word}."
+    
+    if attempt <= len(words):  # Show next question if there are more
+        question_text = f"What is the English word for {words[attempt-1][0]}?"
+        return render_template('test.html', question_text=question_text, correct_word=words[attempt-1][1], attempt=attempt, message=message)
+    else:
+        # End of test - show final message or score
+        score = 100 * (attempt - 1) / len(words)  # Example scoring logic
+        message = f"Your final score is: {score}%"
+        if score < 60:
+            message += " 숙제"
+        return render_template('test.html', question_text="", correct_word="", attempt=0, message=message)
 
-# Run the test
-phonics_test()
+if __name__ == '__main__':
+    app.run(debug=True)
