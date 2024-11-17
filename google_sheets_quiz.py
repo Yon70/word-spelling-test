@@ -25,8 +25,8 @@ response_worksheet = response_sheet.get_worksheet(0)  # First sheet in the Stude
 # Example student answers and score calculation
 student_id = 1
 student_name = "John Doe"
-student_answers = ["yellow", "blue", "red", "green", "purple", "orange", "brown", "pink", "black", "white"]
-correct_answers = ["yellow", "blue", "red", "green", "purple", "orange", "brown", "pink", "black", "white"]
+student_answers = ["yellow", "blue", "red", "green", "purple", "orange", "blue", "pink", "black", "white"]
+correct_answers = [row[1] for row in answer_worksheet.get_all_values()[1:]]  # Fetching answers from Sheet 1
 
 # Compare answers
 correct_count = sum([1 for i, answer in enumerate(student_answers) if answer == correct_answers[i]])
