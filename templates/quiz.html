@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 20px;
+        }
+
+        p {
+            font-size: 20px;
+        }
+
+        input[type="text"] {
+            padding: 5px;
+            font-size: 20px;
+            margin-top: 10px;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        a {
+            display: inline-block;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 20px;
+            text-decoration: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
+
+        a:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Word Quiz</h1>
+        <p>{{ message }}</p>
+        {% if attempt > 0 %}
+        <form method="POST">
+            <p>{{ question.hint }}: {{ blanks }}</p>
+            <input type="text" name="answer" placeholder="Your answer" required>
+            <input type="hidden" name="correct_word" value="{{ correct_word }}">
+            <input type="hidden" name="attempt" value="{{ attempt }}">
+            <button type="submit">Submit</button>
+        </form>
+        {% else %}
+        <a href="{{ url_for('quiz', question_index=question_index, correct_count=correct_count, total_attempts=total_attempts) }}">Next Question</a>
+        {% endif %}
+    </div>
+</body>
+</html>
