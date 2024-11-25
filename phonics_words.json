@@ -1,0 +1,10 @@
+[
+    {"word": "grandmother", "hint": "할머니"},
+    {"word": "grandfather", "hint": "할아버지"},
+    {"word": "mother", "hint": "어머니"},
+    {"word": "father", "hint": "아버지"},
+    {"word": "sister", "hint": "언니/누나"},
+    {"word": "brother", "hint": "형/오빠"},
+    {"word": "baby sister", "hint": "여동생"},
+    {"word": "baby brother", "hint": "남동생"}
+]
